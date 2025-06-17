@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Comparison: Cleo & Thea</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom font and scrollbar styling */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom styling for the vertical range input */
+        .vertical-range-slider {
+          -webkit-appearance: none; /* Remove default WebKit styles */
+          appearance: none; /* Remove default styles */
+          background: transparent; /* Make background transparent initially */
+          width: 8px; /* Thickness of the slider track */
+          margin: 0 auto; /* Center the track horizontally */
+          padding: 0; /* Remove default padding */
+          height: 100%; /* Take full height */
+          writing-mode: bt-lr; /* Bottom-to-top layout */
+          -webkit-appearance: slider-vertical; /* Specific for Webkit vertical slider */
+        }
+
+        /* Webkit (Chrome, Safari) thumb */
+        .vertical-range-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px; /* Thumb size */
+          height: 20px;
+          background: var(--thumb-bg, #3B82F6);
+          border-radius: 50%;
+          cursor: grab;
+          box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--thumb-bg, #3B82F6);
+          margin-top: 0; 
+          z-index: 1; 
+        }
+
+        /* Webkit (Chrome, Safari) track */
+        .vertical-range-slider::-webkit-slider-runnable-track {
+          background: #4a5568; /* Gray track */
+          height: 100%;
+          width: 8px;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        /* Firefox thumb */
+        .vertical-range-slider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          background: var(--thumb-bg, #3B82F6);
+          border-radius: 50%;
+          cursor: grab;
+          box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--thumb-bg, #3B82F6);
+        }
+
+        /* Firefox track */
+        .vertical-range-slider::-moz-range-track {
+          background: #4a5568;
+          width: 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          height: 100%;
+          margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-950 to-gray-800 text-gray-100">
+
+    <!-- Main App Container -->
+    <div id="app-root" class="min-h-screen p-6 flex flex-col items-center">
+        <h1 class="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mb-12 mt-4 text-center tracking-wider drop-shadow-lg">Cousins of Contrast</h1>
+
+        <!-- Character Cards Container -->
+        <div id="character-cards-container" class="flex flex-col lg:flex-row justify-center items-stretch w-full max-w-7xl">
+            <!-- Character cards will be injected here by JavaScript -->
+        </div>
+
+        <!-- Relationship Dynamic Section -->
+        <div id="relationship-dynamic-container" class="bg-gray-800 p-8 rounded-lg shadow-xl m-4 w-full max-w-7xl border-2 border-emerald-600 border-dashed">
+            <!-- Content will be injected here -->
+        </div>
+
+        <!-- Erotic Polarity & Judgment Section -->
+        <div id="erotic-polarity-container" class="bg-gray-800 p-8 rounded-lg shadow-xl m-4 w-full max-w-7xl border-2 border-rose-600 border-dashed">
+            <!-- Content will be injected here -->
+        </div>
+        
+        <!-- Sample Dialogue Section -->
+        <div id="dialogue-container" class="bg-gray-800 p-8 rounded-lg shadow-xl m-4 w-full max-w-7xl border-2 border-sky-600 border-dashed">
+            <!-- Content will be injected here -->
+        </div>
+    </div>
+
+    <!-- Full Screen Image Viewer (Initially Hidden) -->
+    <div id="full-screen-viewer" class="hidden fixed inset-0 bg-gray-950 bg-opacity-95 flex items-center justify-center z-50 p-4">
+        <!-- Close button -->
+        <button id="close-viewer-btn" class="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white p-3 rounded-md shadow-lg text-xl z-50 transition duration-300 ease-in-out transform hover:scale-110 w-12 h-12 flex items-center justify-center" aria-label="Close">&times;</button>
+
+        <!-- Zoom controls -->
+        <div class="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col items-center justify-between space-y-3 z-50 bg-gray-700 bg-opacity-80 p-3 rounded-lg shadow-xl w-12">
+            <button id="zoom-in-btn" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg text-xl w-10 h-10 flex items-center justify-center transition duration-300 ease-in-out transform hover:scale-110" aria-label="Zoom In">+</button>
+            <input id="zoom-slider" type="range" orient="vertical" min="1" max="4" step="0.01" value="1" class="vertical-range-slider flex-grow" style="--thumb-bg: #3B82F6;"/>
+            <button id="zoom-out-btn" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg text-xl w-10 h-10 flex items-center justify-center transition duration-300 ease-in-out transform hover:scale-110" aria-label="Zoom Out">-</button>
+            <p id="zoom-level-text" class="text-sm text-gray-200 mt-2 text-center">Zoom: 1.0x</p>
+        </div>
+
+        <!-- Image container -->
+        <div class="relative w-full h-full flex items-center justify-center overflow-hidden">
+            <img id="viewer-image" src="" alt="Full screen view" class="max-w-full max-h-full object-contain" draggable="false"/>
+        </div>
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded before running scripts
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- DATA --- //
+            const cleoData = {
+                fullName: "Cleopatra “Cleo” Neferura",
+                image: "https://files.catbox.moe/h7361x.png",
+                origin: "Ancient Egyptian lineage",
+                appearance: { bodyType: "Curvaceous figure, ample chest.", hairEyes: "Glossy, deep black hair with bold blue highlights, bob cut framing high cheekbones. Radiant golden eyes.", clothing: "Form-fitting linen adorned with gold accents. Often wears traditional Egyptian jewelry: beaded collars, serpent-shaped bracelets, and Eye of Horus motifs.", notableFeatures: "Dark-skinned woman. Full, gold-painted lips shimmer like desert treasure. Light-colored nipples.", generalFeatures: "Striking, with a regal but seductive air. Her presence is both commanding and mysterious, like the desert under moonlight." },
+                personality: { traits: "Graceful, enigmatic, commanding. Emotionally guarded.", quirks: "Always seems to know more than she reveals.", likes: "Refined, pale-skinned Greek noblemen with small, almost delicate penises. Sees them as symbols of submissiveness and her superiority, ornamental, and obedient. Loves being worshipped as an untouchable goddess.", dislikes: "Large, dark-skinned men (views them as vulgar, overly physical, devoid of subtlety, savagery, a reminder of the laboring class she rules over)." },
+                eroticPreference: { summary: "Small White Penises (Greek Noblemen)", description: "Cleo is drawn to refined, pale-skinned Greek noblemen, especially those with small, almost delicate penises. To her, it’s not a flaw but a feature—a symbol of their submissiveness and her superiority. She sees white, small-endowed lovers as ornamental and obedient, men who exist to be humbled by her presence and molded to her desires. She loves how they worship her as an untouchable goddess, afraid to disappoint her, eager to prove their worth in other ways.", quote: "“He came from a line of scholars and warriors… yet when I unwrapped him, I found only humility. Perfect.”", disdain: "Cleo despises large, dark-skinned men, particularly those Thea prefers. She views them as vulgar, overly physical, and devoid of subtlety. In her eyes, their size represents brute force over finesse, and their dark skin—a reminder of the laboring class she rules over, not sleeps with.", disdainQuote: "“What Thea calls strength, I call savagery. I don’t need to be conquered—I already rule.”" }
+            };
+            const theaData = {
+                fullName: "Thaleia “Thea” Kalomira",
+                image: "https://files.catbox.moe/nm0edq.png",
+                origin: "Distant cousin from Greek nobility",
+                appearance: { bodyType: "Equally voluptuous silhouette, similar to Cleo's body shape.", hairEyes: "Short bob cut with inner hair glow of turquoise, like the Aegean Sea. Silver eyes gleam with intelligence and mischief.", clothing: "Flowing white chiton with gold trim, a laurel crown, and simple but elegant Greek sandals.", notableFeatures: "Fair-skinned with a soft olive undertone. Silver-painted lips give her a cooler, ethereal charm. Dark-colored nipples.", generalFeatures: "Resembles Cleo in facial structure. Aesthetic is lighter and more fluid—like ocean foam to Cleo’s sand and sun." },
+                personality: { traits: "Lively, witty, insightful. Balances classical elegance with playful intelligence. A skilled diplomat and flirt.", quirks: "Often uses words like a fencer uses a blade.", likes: "Raw dominance and primal beauty of dark-skinned Egyptian men, especially those of exceptional size. Drawn to servants, guards, and slaves, reveling in the reversal of rank.", dislikes: "Pale, soft-bodied men Cleo treasures, often mocking them for being under-endowed and over-appreciated. Views them as timid little ornaments, incapable of real satisfaction." },
+                eroticPreference: { summary: "Big Black Cocks (Egyptian Slaves)", description: "Thea craves the raw dominance and primal beauty of dark-skinned Egyptian men, especially those of exceptional size. To her, a big black cock is a a divine weapon, one that breaks her noble poise and leaves her breathless. She’s drawn to servants, guards, and slaves—not despite their status, but because of it. She revels in the reversal: the idea that the one beneath her in rank can overwhelm her in the bedchamber.", quote: "“They think me a goddess in silk—but he sees the ache behind my smile. And with one thrust, I become a worshipper.”", disdain: "She scorns the pale, soft-bodied men Cleo treasures, often mocking them for being under-endowed and over-appreciated. In her view, Cleo’s lovers are timid little ornaments, incapable of giving real satisfaction.", disdainQuote: "“A pretty little thing with a pink inch doesn’t make a man. It makes a distraction.”" }
+            };
+            const relationshipDynamic = { summary: "Though distant cousins, they share a unique bond—a mirrored duality. Cleo is the sun; Thea is the moon. One rules through still power, the other through graceful movement. Where Cleo is revered, Thea is adored. Together, they embody the harmony of two ancient worlds." };
+            const eroticPolarityJudgment = { summary: "Their sexual preferences are as much about power and identity as they are about race and size. Each woman believes her choice of lover is a reflection of superior taste, intelligence, and self-knowledge.", cleoJudgment: "Cleo: Sees Thea’s black, well-endowed slaves as uncultured beasts, fitting for a woman who seeks sensation over substance.", theaJudgment: "Thea: Sees Cleo’s small, white noblemen as pitiful and sexless, “fit for reciting poems, not taking a woman.”", tension: "Their mutual disgust adds a layer of sexual rivalry and tension. Though close, they each secretly believe the other is deeply unfulfilled, deluded by her own desires." };
+            const initialDialogue = [ { setting: "A private palace garden. Moonlight casts shadows over marble and sandstone. Perfumed air swirls as Cleo reclines on a cushioned lounge, Thea swirling wine in her goblet nearby.", lines: [ { speaker: "Cleo", text: "Tell me, Thea… does he even know your name, or does he only grunt it between thrusts?" }, { speaker: "Thea", text: "Oh, he knows it well. Screamed it twice before your guards heard and turned redder than your rubies." }, { speaker: "Cleo", text: "I suppose brute force impresses those who can’t command silence." }, { speaker: "Thea", text: "And I suppose poetry soothes those too fragile to be handled." }, { speaker: "Cleo", text: "Ah, but mine kneel with reverence, not because they must—but because they know their place." }, { speaker: "Thea", text: "Indeed. I like mine when they forget theirs." }, ] }, { setting: "The royal bathhouse at dusk. Steam rises from a sunken marble pool scented with lotus oil. Cleo reclines on a carved bench, her golden eyes half-lidded. Thea stands nearby, slowly removing her chiton, letting the fabric pool at her feet.", lines: [ { speaker: "Cleo", text: "You always undress like you're dancing for the moon. Are you hoping one of your oxen is watching from the shadows?" }, { speaker: "Thea", text: "Perhaps. But it's not them I wish to tempt tonight." }, { speaker: "Cleo", text: "Flatter me, but don’t mistake me for one of your slaves. I don’t break for anything… least of all a woman drunk on cock and rebellion." }, { speaker: "Thea", text: "Oh, Cleo… you say rebellion like it’s a fault. But isn’t surrender the sweetest rebellion of all? When your thighs part for the very thing you claim to disdain…" }, { speaker: "Cleo", text: "I don’t part. I summon. And when they come to me, they tremble. Not from lust—but from awe." }, { speaker: "Thea", text: "They tremble because they’re boys with baby dicks hoping their flattery will make up for what’s missing." }, { speaker: "Cleo", text: "And yet, I find them delightful. So easily dominated… so eager to please. Not like your… beasts. Grunting and thrusting like it’s all they’ve ever known." }, { speaker: "Thea", text: "But it is all they need to know… when they stretch me open and I forget every Greek syllable I ever learned…" }, { speaker: "Cleo", text: "Language is for the mind, not the moan. I prefer a lover who listens to my breath, not drowns it in sweat and spit." }, { speaker: "Thea", text: "Then you’ve never been taken so well that breath becomes moan. Maybe that’s why you speak so coldly… untouched where it matters most." }, { speaker: "Cleo", text: "I am worshipped. And I never beg." }, { speaker: "Thea", text: "And I am broken—gloriously, sinfully broken. Night after night. You sit on a throne, cousin… but I ride gods." }, ] }, { setting: "The bathhouse flickers in lamplight. Cleo and Thea are half-submerged in the scented waters, their glowing skin damp with steam. Suddenly, the stone doors part silently. Two figures step in. The Greek nobleman, slim and pale, draped in a sheer tunic, his eyes downcast in reverence. The Egyptian slave, shirtless, his onyx skin gleaming, muscles taut, eyes bold and unblinking as he enters like a lion—knowing Thea is already wet for him.", lines: [ { speaker: "Thea", text: "Mmm… you see? Mine doesn’t knock. He knows he’s wanted." }, { speaker: "Cleo", text: "And mine doesn’t need to be loud. He kneels because he understands." }, { speaker: "Thea", text: "Is that understanding… or fear? He looks like he’s never seen a woman’s heat up close." }, { speaker: "Cleo", text: "He’s seen mine. He’s studied it. With lips, with tongue, with tears of gratitude." }, { speaker: "Thea", text: "Come." }, { speaker: "Cleo", text: "Hm. A cudgel. How… subtle." }, { speaker: "Thea", text: "Not subtle. Satisfying." }, { speaker: "Cleo", text: "May I… serve, my lady?" }, { speaker: "Cleo", text: "You may worship. Gently." }, { speaker: "Thea", text: "Mmm, he’s not afraid to bruise me. Not afraid to lose control." }, { speaker: "Cleo", text: "I don’t want control lost. I want it surrendered. Piece by trembling piece." }, { speaker: "Thea", text: "And I want it ripped from me." }, { speaker: "Thea", text: "Cleo… I wonder… when was the last time you screamed?" }, { speaker: "Cleo", text: "When was the last time you came without begging?" }, ] }, { setting: "A grand sunlit chamber in the palace overlooking the Nile. Two luxurious couches face one another, separated by a shallow pool of rosewater. Cleo reclines like a goddess carved in onyx and gold, her belly full and round beneath sheer linen. Across from her, Thea rests, draped in white silk, her own pregnant form glowing like the moon risen over marble. Attendants keep their distance. This moment is for the two of them.", lines: [ { speaker: "Cleo", text: "He stirs with the sunrise… every morning like clockwork. Already disciplined. Already divine." }, { speaker: "Thea", text: "Mine kicks like thunder. Strong. Restless. He’ll never wait for a sunrise to take what’s his." }, { speaker: "Cleo", text: "A brute in the womb… how fitting. I suppose he’ll arrive fists first, just like his father." }, { speaker: "Thea", text: "Better fists than fear. Your nobleman cried when he spilled inside you, didn’t he?" }, { speaker: "Cleo", text: "He wept. With reverence. He knew what he was offering—bloodline, intellect, beauty… not just meat and moans." }, { speaker: "Thea", text: "Mine offered power. Enough to make me scream loud enough for the Nile to change course." }, { speaker: "Cleo", text: "And yet, here you are—bloated with a slave’s child. Do you imagine he’ll rise to rule… or grunt behind palace doors like his sire?" }, { speaker: "Thea", text: "And yours? Pale, delicate… I wonder if he’ll have the courage to even look a woman in the eye." }, { speaker: "Cleo", text: "He won’t need to. Others will look up to him. He’ll be adored. Obeyed. Feared—beautifully." }, { speaker: "Thea", text: "Mine will take what’s his. No speeches, no prayers. Just hands, hips, and hunger. Like his father." }, { speaker: "Cleo", text: "And like his father… he’ll kneel for mine." }, ] }, { setting: "The inner chamber of the palace, twilight filtering through gauzy drapes. The air smells of myrrh and milk. Two golden cradles sit side by side, but the mothers do not use them—not yet. Cleo reclines against plush cushions of lapis and ivory, her dark skin radiant with postnatal warmth. Her sheer linen robe is loosened, one full breast exposed, its light nipple darkened with milk. Nestled at it: a pale, delicate infant, pink-lipped and wide-eyed, drinking greedily. His tiny fingers clutch at her skin, his head resting like alabaster on obsidian. Across from her, Thea sits with one leg curled beneath her, moonlight catching her light skin and silver-streaked hair. Her robe has slipped from one shoulder, baring a heavy breast with a dark, full nipple that seems to pulse with life. Her son—rich brown skin, thick curls, and fists clenched even as he feeds—suckles with primal need.", lines: [ { speaker: "Cleo", text: "He latches like a scholar… eager, but precise. I swear he makes eye contact, even now. As if he already understands who I am." }, { speaker: "Thea", text: "Mine doesn’t care who I am. He claims me. Like his father. No poetry, just hunger." }, { speaker: "Cleo", text: "Of course. The beast feeds like it’s a conquest." }, { speaker: "Thea", text: "And yours… like he’s been granted an audience. Careful not to spill a drop. So polite." }, { speaker: "Thea", text: "Good. He should be. He drinks from divinity." }, { speaker: "Thea", text: "So does mine. But divinity, to him, is something you take. His mouth is already defiant." }, { speaker: "Cleo", text: "Your skin… so pale. And yet that nipple is nearly as dark as his little mouth. It’s almost… poetic." }, { speaker: "Thea", text: "And yours—dark as night, but blooming pale where he feeds. Like the moon rising from the desert." }, { speaker: "Cleo", text: "A reversal. A reminder." }, { speaker: "Thea", text: "That we carry what we are not… and made them everything." }, { speaker: "Cleo", text: "Not everything. Just the next move." }, { speaker: "Thea", text: "Let them grow. Let them clash. Let them love… maybe even what we couldn’t." }, { speaker: "Cleo", text: "Or let them finish what we started." }, ] } ];
+
+            // --- DOM Elements --- //
+            const characterCardsContainer = document.getElementById('character-cards-container');
+            const relationshipContainer = document.getElementById('relationship-dynamic-container');
+            const polarityContainer = document.getElementById('erotic-polarity-container');
+            const dialogueContainer = document.getElementById('dialogue-container');
+            const viewer = document.getElementById('full-screen-viewer');
+            const viewerImage = document.getElementById('viewer-image');
+            const closeViewerBtn = document.getElementById('close-viewer-btn');
+
+            // --- Render Functions --- //
+
+            // Function to render a single character card
+            const renderCharacterCard = (character) => {
+                const cardHTML = `
+                    <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl m-4 w-full lg:w-1/2 min-h-[auto] border-2 border-purple-600">
+                        <div class="w-full flex justify-center mb-6">
+                            <img src="${character.image}" alt="${character.fullName}" class="character-image max-w-[400px] max-h-[400px] object-contain rounded-lg border-4 border-amber-400 shadow-lg cursor-pointer transition transform hover:scale-105" data-img-src="${character.image}" onerror="this.onerror=null;this.src='https://placehold.co/400x400/333333/FFFFFF?text=${character.fullName.split(' ')[0]}';">
+                        </div>
+                        <h2 class="text-4xl font-bold text-amber-300 mb-2 text-center tracking-wide">${character.fullName}</h2>
+                        <p class="text-lg text-gray-400 mb-6 text-center italic">${character.origin}</p>
+                        <div class="w-full overflow-y-auto flex-grow px-2 pb-4 leading-relaxed">
+                            <div class="w-full mb-6">
+                                <h3 class="text-2xl font-semibold text-purple-400 border-b-2 border-purple-700 pb-2 mb-4">Appearance</h3>
+                                <ul class="text-gray-200 list-disc list-inside space-y-2">
+                                    <li><span class="font-medium text-amber-300">Body Type:</span> ${character.appearance.bodyType}</li>
+                                    <li><span class="font-medium text-amber-300">Hair/Eyes:</span> ${character.appearance.hairEyes}</li>
+                                    <li><span class="font-medium text-amber-300">Clothing:</span> ${character.appearance.clothing}</li>
+                                    <li><span class="font-medium text-amber-300">Notable Features:</span> ${character.appearance.notableFeatures}</li>
+                                    <li><span class="font-medium text-amber-300">General Features:</span> ${character.appearance.generalFeatures}</li>
+                                </ul>
+                            </div>
+                            <div class="w-full mb-6">
+                                <h3 class="text-2xl font-semibold text-purple-400 border-b-2 border-purple-700 pb-2 mb-4">Personality</h3>
+                                <ul class="text-gray-200 list-disc list-inside space-y-2">
+                                    <li><span class="font-medium text-amber-300">Traits:</span> ${character.personality.traits}</li>
+                                    <li><span class="font-medium text-amber-300">Quirks:</span> ${character.personality.quirks}</li>
+                                    <li><span class="font-medium text-amber-300">Likes:</span><p class="ml-4 text-gray-300">${character.personality.likes}</p></li>
+                                    <li><span class="font-medium text-amber-300">Dislikes:</span><p class="ml-4 text-gray-300">${character.personality.dislikes}</p></li>
+                                </ul>
+                            </div>
+                            <div class="w-full mb-6">
+                                <h3 class="text-2xl font-semibold text-purple-400 border-b-2 border-purple-700 pb-2 mb-4">Erotic Preference: <span class="text-amber-300">${character.eroticPreference.summary}</span></h3>
+                                <p class="text-gray-200 mb-3">${character.eroticPreference.description}</p>
+                                <p class="text-gray-400 italic mb-3">"${character.eroticPreference.quote}"</p>
+                                <p class="text-gray-200 mb-3">${character.eroticPreference.disdain}</p>
+                                <p class="text-gray-400 italic">"${character.eroticPreference.disdainQuote}"</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                characterCardsContainer.innerHTML += cardHTML;
+            };
+
+            // Function to render static sections
+            const renderStaticSections = () => {
+                // Relationship Dynamic
+                relationshipContainer.innerHTML = `
+                    <h3 class="text-3xl font-bold text-emerald-400 mb-4 text-center">🧿 Relationship Dynamic</h3>
+                    <p class="text-gray-200 text-lg text-center leading-relaxed">${relationshipDynamic.summary}</p>
+                `;
+
+                // Erotic Polarity
+                polarityContainer.innerHTML = `
+                    <h3 class="text-3xl font-bold text-rose-400 mb-4 text-center">🧿 Erotic Polarity & Judgment</h3>
+                    <p class="text-gray-200 text-lg mb-4 text-center leading-relaxed">${eroticPolarityJudgment.summary}</p>
+                    <div class="flex flex-col md:flex-row justify-around items-start space-y-6 md:space-y-0 md:space-x-8 mt-6">
+                        <div class="w-full md:w-1/2 p-4 bg-gray-700 rounded-md border border-gray-600">
+                            <h4 class="text-xl font-semibold text-purple-300 mb-2">Cleo's Judgment:</h4>
+                            <p class="text-gray-200 leading-normal">${eroticPolarityJudgment.cleoJudgment}</p>
+                        </div>
+                        <div class="w-full md:w-1/2 p-4 bg-gray-700 rounded-md border border-gray-600">
+                            <h4 class="text-xl font-semibold text-blue-300 mb-2">Thea's Judgment:</h4>
+                            <p class="text-gray-200 leading-normal">${eroticPolarityJudgment.theaJudgment}</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-200 text-lg mt-8 text-center leading-relaxed italic">${eroticPolarityJudgment.tension}</p>
+                `;
+            };
+
+            // Function to render dialogue
+            const renderDialogue = () => {
+                let dialogueHTML = `<h3 class="text-3xl font-bold text-sky-400 mb-6 text-center">🎭 Sample Dialogue: Cleo & Thea</h3>`;
+                initialDialogue.forEach(scene => {
+                    dialogueHTML += `
+                        <div class="mb-8 p-6 bg-gray-700 rounded-lg shadow-inner border border-gray-600">
+                            <p class="text-gray-400 italic mb-4 text-md leading-snug">Setting: ${scene.setting}</p>
+                    `;
+                    scene.lines.forEach(line => {
+                        const speakerColor = line.speaker === "Cleo" ? "text-amber-300" : "text-cyan-300";
+                        dialogueHTML += `
+                            <p class="mb-2 text-lg">
+                                <span class="font-bold ${speakerColor}">${line.speaker}</span>: <span class="text-gray-100">${line.text}</span>
+                            </p>
+                        `;
+                    });
+                    dialogueHTML += `</div>`;
+                });
+                dialogueContainer.innerHTML = dialogueHTML;
+            };
+
+            // --- Initial Page Load --- //
+            renderCharacterCard(cleoData);
+            renderCharacterCard(theaData);
+            renderStaticSections();
+            renderDialogue();
+            
+            // --- Full Screen Image Viewer Logic --- //
+            const characterImages = document.querySelectorAll('.character-image');
+            
+            characterImages.forEach(img => {
+                img.addEventListener('click', (e) => {
+                    const src = e.target.dataset.imgSrc;
+                    viewerImage.src = src;
+                    viewer.classList.remove('hidden');
+                });
+            });
+
+            closeViewerBtn.addEventListener('click', () => {
+                viewer.classList.add('hidden');
+                resetZoom(); // Reset zoom state when closing
+            });
+            
+            // Zoom and Pan logic
+            let zoomLevel = 1;
+            let position = { x: 0, y: 0 };
+            let isDragging = false;
+            let startDrag = { x: 0, y: 0 };
+            let startPos = { x: 0, y: 0 };
+            
+            let isPinching = false;
+            let initialPinchDistance = 0;
+            let initialZoomLevel = 1;
+
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+            const zoomSlider = document.getElementById('zoom-slider');
+            const zoomLevelText = document.getElementById('zoom-level-text');
+
+            const MAX_ZOOM = 4;
+            const MIN_ZOOM = 1;
+            const ZOOM_STEP = 0.1;
+            
+            const updateImageTransform = () => {
+                viewerImage.style.transform = `scale(${zoomLevel}) translate(${position.x / zoomLevel}px, ${position.y / zoomLevel}px)`;
+                viewerImage.style.transition = isDragging || isPinching ? 'none' : 'transform 0.1s ease-out';
+                viewerImage.style.cursor = zoomLevel > MIN_ZOOM ? 'grab' : '';
+                zoomSlider.value = zoomLevel;
+                zoomLevelText.textContent = `Zoom: ${zoomLevel.toFixed(1)}x`;
+            };
+
+            const getNewPosition = (oldZoom, newZoom, oldPos, focalPoint) => {
+                return {
+                    x: (oldPos.x - focalPoint.x) * (newZoom / oldZoom) + focalPoint.x,
+                    y: (oldPos.y - focalPoint.y) * (newZoom / oldZoom) + focalPoint.y
+                };
+            };
+            
+            const updateZoom = (newZoom, focalPoint = { x: 0, y: 0 }) => {
+                let constrainedZoom = Math.max(MIN_ZOOM, Math.min(newZoom, MAX_ZOOM));
+                if (constrainedZoom !== zoomLevel) {
+                    position = getNewPosition(zoomLevel, constrainedZoom, position, focalPoint);
+                    zoomLevel = constrainedZoom;
+                }
+                if (constrainedZoom === MIN_ZOOM) {
+                    position = { x: 0, y: 0 };
+                }
+                updateImageTransform();
+            };
+
+            const resetZoom = () => {
+                zoomLevel = MIN_ZOOM;
+                position = { x: 0, y: 0 };
+                updateImageTransform();
+            };
+
+            // Event Listeners for Zoom/Pan
+            zoomInBtn.addEventListener('click', () => updateZoom(zoomLevel + ZOOM_STEP));
+            zoomOutBtn.addEventListener('click', () => updateZoom(zoomLevel - ZOOM_STEP));
+            zoomSlider.addEventListener('input', (e) => updateZoom(parseFloat(e.target.value)));
+
+            viewerImage.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                let newZoom = e.deltaY < 0 ? zoomLevel + ZOOM_STEP : zoomLevel - ZOOM_STEP;
+                const imgRect = viewerImage.getBoundingClientRect();
+                const focalPoint = {
+                    x: e.clientX - imgRect.left - (imgRect.width / 2),
+                    y: e.clientY - imgRect.top - (imgRect.height / 2)
+                };
+                updateZoom(newZoom, focalPoint);
+            }, { passive: false });
+
+            viewerImage.addEventListener('mousedown', (e) => {
+                if (zoomLevel > MIN_ZOOM) {
+                    isDragging = true;
+                    startDrag = { x: e.clientX, y: e.clientY };
+                    startPos = { ...position };
+                    viewerImage.style.cursor = 'grabbing';
+                    e.preventDefault();
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startDrag.x;
+                const dy = e.clientY - startDrag.y;
+                position.x = startPos.x + dx;
+                position.y = startPos.y + dy;
+                updateImageTransform();
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                viewerImage.style.cursor = zoomLevel > MIN_ZOOM ? 'grab' : '';
+            });
+
+            // Touch events
+            viewerImage.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    isPinching = true;
+                    isDragging = false;
+                    const dx = e.touches[1].clientX - e.touches[0].clientX;
+                    const dy = e.touches[1].clientY - e.touches[0].clientY;
+                    initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+                    initialZoomLevel = zoomLevel;
+                } else if (e.touches.length === 1 && zoomLevel > MIN_ZOOM) {
+                    isDragging = true;
+                    startDrag = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    startPos = { ...position };
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchmove', (e) => {
+                if (isPinching && e.touches.length === 2) {
+                    e.preventDefault();
+                    const dx = e.touches[1].clientX - e.touches[0].clientX;
+                    const dy = e.touches[1].clientY - e.touches[0].clientY;
+                    const currentPinchDistance = Math.sqrt(dx * dx + dy * dy);
+                    let newZoom = initialZoomLevel * (currentPinchDistance / initialPinchDistance);
+                    updateZoom(newZoom);
+                } else if (isDragging && e.touches.length === 1) {
+                    e.preventDefault();
+                    const dx = e.touches[0].clientX - startDrag.x;
+                    const dy = e.touches[0].clientY - startDrag.y;
+                    position.x = startPos.x + dx;
+                    position.y = startPos.y + dy;
+                    updateImageTransform();
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchend', (e) => {
+                isDragging = false;
+                isPinching = false;
+                if (zoomLevel === MIN_ZOOM) {
+                    position = { x: 0, y: 0 };
+                    updateImageTransform();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
